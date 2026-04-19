@@ -1,0 +1,95 @@
+{% extends 'gym/base_admin.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title|upper|truncatechars:15 }}{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'member_list' %}" class="btn btn-outline btn-sm">← Back</a>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:700px">
+<form method="post" enctype="multipart/form-data">
+{% csrf_token %}
+<div class="card">
+  <div class="card-header">Personal Information</div>
+  <div class="card-body">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name *</label>
+        <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" class="form-control" placeholder="Rahul" required>
+        {% if form.first_name.errors %}<div style="color:#f87171; font-size:0.75rem; margin-top:4px">{{ form.first_name.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name *</label>
+        <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" class="form-control" placeholder="Kumar" required>
+        {% if form.last_name.errors %}<div style="color:#f87171; font-size:0.75rem; margin-top:4px">{{ form.last_name.errors.0 }}</div>{% endif %}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Phone *</label>
+        <input type="tel" name="phone" value="{{ form.phone.value|default:'' }}" class="form-control" placeholder="+91 98765 43210" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="form-control" placeholder="rahul@example.com">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Profile Photo</label>
+      {% if member and member.photo %}
+        <div style="margin-bottom:10px">
+          <img src="{{ member.photo.url }}" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:2px solid var(--red)">
+        </div>
+      {% endif %}
+      <input type="file" name="photo" accept="image/*" class="form-control">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea name="notes" class="form-control" rows="3" placeholder="Any notes about this member…">{{ form.notes.value|default:'' }}</textarea>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-2">
+  <div class="card-header">Membership Details</div>
+  <div class="card-body">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Join Date</label>
+        <input type="date" name="join_date" value="{{ form.join_date.value|default:'' }}" class="form-control">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Membership Plan</label>
+        <select name="membership_plan" class="form-control">
+          <option value="">— No Plan —</option>
+          {% for plan in plans %}
+          <option value="{{ plan.pk }}" {% if form.membership_plan.value|stringformat:'s' == plan.pk|stringformat:'s' %}selected{% endif %}>
+            {{ plan.name }} ({{ plan.duration_months }}mo — ₹{{ plan.price }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Plan Start Date</label>
+        <input type="date" name="plan_start_date" value="{{ form.plan_start_date.value|default:'' }}" class="form-control">
+      </div>
+      <div class="form-group" style="display:flex; align-items:flex-end">
+        <div style="background:var(--dark3); border:1px solid var(--border); border-radius:6px; padding:10px 14px; width:100%; font-size:0.82rem; color:var(--light-gray)">
+          End date auto-calculated from plan duration
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex; gap:12px; margin-top:20px">
+  <button type="submit" class="btn btn-primary">
+    {% if member %}Save Changes{% else %}Add Member{% endif %} →
+  </button>
+  <a href="{% url 'member_list' %}" class="btn btn-outline">Cancel</a>
+</div>
+</form>
+</div>
+{% endblock %}

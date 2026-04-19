@@ -1,0 +1,63 @@
+{% extends 'gym/base_admin.html' %}
+{% block title %}Settings{% endblock %}
+{% block page_title %}GYM <span>SETTINGS</span>{% endblock %}
+
+{% block content %}
+<div style="max-width:640px">
+<form method="post">
+{% csrf_token %}
+
+<div class="card">
+  <div class="card-header">Gym Information</div>
+  <div class="card-body">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Gym Name *</label>
+        <input type="text" name="gym_name" value="{{ form.gym_name.value|default:'' }}" class="form-control" placeholder="Iron Forge Gym" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Owner Name *</label>
+        <input type="text" name="owner_name" value="{{ form.owner_name.value|default:'' }}" class="form-control" placeholder="Your Name" required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input type="tel" name="phone_number" value="{{ form.phone_number.value|default:'' }}" class="form-control" placeholder="+91 98765 43210">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="form-control" placeholder="gym@example.com">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Address</label>
+      <textarea name="address" class="form-control" rows="3" placeholder="Full gym address…">{{ form.address.value|default:'' }}</textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tagline</label>
+        <input type="text" name="tagline" value="{{ form.tagline.value|default:'' }}" class="form-control" placeholder="Forge Your Legacy">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Established Year</label>
+        <input type="number" name="established_year" value="{{ form.established_year.value|default:2024 }}" class="form-control" min="1900" max="2099">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:20px; padding:16px; background:var(--dark2); border:1px solid var(--border); border-radius:8px">
+  <div style="font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; letter-spacing:2px; color:var(--light-gray); text-transform:uppercase; margin-bottom:8px">ℹ️ Note</div>
+  <p style="font-size:0.82rem; color:var(--light-gray); line-height:1.6">
+    Changes here will reflect on your public website homepage (gym name, phone, email, owner name). Make sure details are accurate before saving.
+  </p>
+</div>
+
+<div style="display:flex; gap:12px; margin-top:20px">
+  <button type="submit" class="btn btn-primary">Save Settings →</button>
+  <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
+</div>
+</form>
+</div>
+{% endblock %}

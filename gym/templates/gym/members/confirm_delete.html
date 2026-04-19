@@ -1,0 +1,24 @@
+{% extends 'gym/base_admin.html' %}
+{% block title %}Delete Member{% endblock %}
+{% block page_title %}DELETE <span>MEMBER</span>{% endblock %}
+
+{% block content %}
+<div style="max-width:480px; margin:60px auto; text-align:center">
+  <div class="card">
+    <div class="card-body" style="padding:40px">
+      <div style="font-size:3rem; margin-bottom:16px">⚠️</div>
+      <div style="font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:2px; margin-bottom:12px">
+        Remove {{ member.full_name }}?
+      </div>
+      <p style="color:var(--light-gray); font-size:0.88rem; margin-bottom:28px; line-height:1.6">
+        This will permanently delete this member along with all their attendance and payment records. This action cannot be undone.
+      </p>
+      <form method="post" style="display:flex; gap:12px; justify-content:center">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'member_detail' member.pk %}" class="btn btn-outline">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

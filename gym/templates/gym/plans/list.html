@@ -1,0 +1,46 @@
+{% extends 'gym/base_admin.html' %}
+{% block title %}Membership Plans{% endblock %}
+{% block page_title %}MEM<span>BERSHIP PLANS</span>{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'plan_add' %}" class="btn btn-primary btn-sm">+ New Plan</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid-3">
+  {% for plan in plans %}
+  <div class="card" style="position:relative; overflow:hidden">
+    {% if plan.is_active %}
+    <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--red)"></div>
+    {% endif %}
+    <div class="card-body" style="padding:24px">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px">
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:2px">{{ plan.name }}</div>
+        <span class="badge {% if plan.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+          {% if plan.is_active %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif; font-size:2.2rem; color:var(--red); letter-spacing:2px; margin-bottom:4px">
+        ₹{{ plan.price }}
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; letter-spacing:2px; color:var(--light-gray); text-transform:uppercase; margin-bottom:12px">
+        {{ plan.duration_months }} Month{{ plan.duration_months|pluralize }}
+      </div>
+      {% if plan.description %}
+      <p style="font-size:0.82rem; color:var(--light-gray); line-height:1.6; margin-bottom:16px">{{ plan.description }}</p>
+      {% endif %}
+      <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid var(--border)">
+        <span style="font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; letter-spacing:2px; color:var(--light-gray)">
+          {{ plan.member_count }} MEMBER{{ plan.member_count|pluralize }}
+        </span>
+        <a href="{% url 'plan_edit' plan.pk %}" class="btn btn-outline btn-sm">Edit</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div style="grid-column:1/-1; padding:48px; text-align:center; color:var(--light-gray)">
+    <div style="font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:3px; margin-bottom:12px">No Plans Yet</div>
+    <a href="{% url 'plan_add' %}" class="btn btn-primary">+ Create First Plan</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

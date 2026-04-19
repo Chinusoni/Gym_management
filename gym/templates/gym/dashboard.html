@@ -1,0 +1,133 @@
+{% extends 'gym/base_admin.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}DASH<span>BOARD</span>{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'attendance' %}" class="btn btn-primary btn-sm">+ Check In</a>
+{% endblock %}
+
+{% block content %}
+<!-- Stat Cards -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">Total Members</div>
+    <div class="stat-value">{{ total_members }}</div>
+    <div class="stat-icon">👥</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Active Members</div>
+    <div class="stat-value red">{{ active_members }}</div>
+    <div class="stat-icon">✅</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Today's Check-ins</div>
+    <div class="stat-value">{{ today_checkins }}</div>
+    <div class="stat-icon">🏃</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Month Revenue</div>
+    <div class="stat-value red">₹{{ month_revenue|floatformat:0 }}</div>
+    <div class="stat-icon">💰</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Expired Members</div>
+    <div class="stat-value">{{ expired_members }}</div>
+    <div class="stat-icon">⏰</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Overdue Payments</div>
+    <div class="stat-value">{{ overdue_payments }}</div>
+    <div class="stat-icon">⚠️</div>
+  </div>
+</div>
+
+<div class="grid-2">
+
+  <!-- Today's Check-ins -->
+  <div class="card">
+    <div class="card-header">
+      Today's Check-ins
+      <a href="{% url 'attendance' %}" class="btn btn-outline btn-sm">View All</a>
+    </div>
+    <div class="card-body" style="padding:0">
+      {% if recent_checkins %}
+      <table>
+        <thead><tr><th>Member</th><th>Time</th></tr></thead>
+        <tbody>
+          {% for a in recent_checkins %}
+          <tr>
+            <td>
+              <div class="member-avatar" style="margin-right:8px">
+                {% if a.member.photo %}<img src="{{ a.member.photo.url }}">{% else %}{{ a.member.first_name|first }}{% endif %}
+              </div>
+              <a href="{% url 'member_detail' a.member.pk %}">{{ a.member.full_name }}</a>
+            </td>
+            <td class="text-muted">{{ a.check_in_time|time:"g:i A" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div style="padding:24px; text-align:center; color:var(--light-gray)">No check-ins today yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Expiring Soon -->
+  <div class="card">
+    <div class="card-header">
+      Expiring This Week
+      <a href="{% url 'member_list' %}?status=active" class="btn btn-outline btn-sm">All Active</a>
+    </div>
+    <div class="card-body" style="padding:0">
+      {% if expiring_soon %}
+      <table>
+        <thead><tr><th>Member</th><th>Expires</th><th>Days</th></tr></thead>
+        <tbody>
+          {% for m in expiring_soon %}
+          <tr>
+            <td><a href="{% url 'member_detail' m.pk %}">{{ m.full_name }}</a></td>
+            <td class="text-muted">{{ m.plan_end_date|date:"d M" }}</td>
+            <td>
+              {% if m.days_until_expiry == 0 %}
+                <span class="badge badge-expired">Today</span>
+              {% else %}
+                <span style="color:#fbbf24; font-family:'Barlow Condensed',sans-serif; font-size:0.8rem; letter-spacing:1px;">{{ m.days_until_expiry }}d</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div style="padding:24px; text-align:center; color:var(--light-gray)">No expiring memberships this week. 🎉</div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<!-- Inactive members -->
+{% if inactive_members %}
+<div class="card mt-3">
+  <div class="card-header">
+    ⚠️ Inactive This Week (Active Members Who Haven't Visited)
+  </div>
+  <div class="card-body" style="padding:0">
+    <table>
+      <thead><tr><th>Member</th><th>Phone</th><th>Plan</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for m in inactive_members %}
+        <tr>
+          <td><a href="{% url 'member_detail' m.pk %}">{{ m.full_name }}</a></td>
+          <td class="text-muted">{{ m.phone }}</td>
+          <td class="text-muted">{{ m.membership_plan.name|default:"—" }}</td>
+          <td><a href="{% url 'member_detail' m.pk %}" class="btn btn-outline btn-sm btn-icon">View →</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

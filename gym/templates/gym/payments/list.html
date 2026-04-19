@@ -1,0 +1,85 @@
+{% extends 'gym/base_admin.html' %}
+{% block title %}Payments{% endblock %}
+{% block page_title %}PAY<span>MENTS</span>{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'payment_add' %}" class="btn btn-primary btn-sm">+ Record Payment</a>
+{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="stat-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:24px">
+  <div class="stat-card">
+    <div class="stat-label">This Month</div>
+    <div class="stat-value red">₹{{ month_paid|floatformat:0 }}</div>
+    <div class="stat-icon">📅</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total Collected</div>
+    <div class="stat-value">₹{{ total_paid|floatformat:0 }}</div>
+    <div class="stat-icon">💰</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pending Payments</div>
+    <div class="stat-value">{{ pending_count }}</div>
+    <div class="stat-icon">⏳</div>
+  </div>
+</div>
+
+<!-- Filter -->
+<form method="get" class="search-bar">
+  <select name="status" class="form-control" style="width:180px">
+    <option value="">All Statuses</option>
+    <option value="paid" {% if status == 'paid' %}selected{% endif %}>Paid</option>
+    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+    <option value="overdue" {% if status == 'overdue' %}selected{% endif %}>Overdue</option>
+  </select>
+  <button type="submit" class="btn btn-primary">Filter</button>
+  {% if status %}<a href="{% url 'payment_list' %}" class="btn btn-outline">Clear</a>{% endif %}
+</form>
+
+<div class="card">
+  <div class="card-header">Payment Records</div>
+  <div class="table-wrap">
+    {% if payments %}
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Member</th>
+          <th>Plan</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+        <tr>
+          <td class="text-muted">{{ p.payment_date|date:"d M Y" }}</td>
+          <td>
+            <a href="{% url 'member_detail' p.member.pk %}">{{ p.member.full_name }}</a>
+          </td>
+          <td class="text-muted">{{ p.plan.name|default:"—" }}</td>
+          <td style="color:var(--red); font-family:'Barlow Condensed',sans-serif; font-size:1rem; letter-spacing:1px; font-weight:700">₹{{ p.amount }}</td>
+          <td><span class="badge badge-{{ p.status }}">{{ p.get_status_display }}</span></td>
+          <td class="text-muted">{{ p.notes|default:"—"|truncatechars:30 }}</td>
+          <td>
+            <form method="post" action="{% url 'payment_delete' p.pk %}" onsubmit="return confirm('Delete this payment record?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm btn-icon">🗑</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div style="padding:48px; text-align:center; color:var(--light-gray)">
+      <div style="font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:3px; margin-bottom:8px">No Payments Found</div>
+      <a href="{% url 'payment_add' %}" class="btn btn-primary">+ Record First Payment</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

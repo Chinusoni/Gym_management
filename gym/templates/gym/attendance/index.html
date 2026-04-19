@@ -1,0 +1,95 @@
+{% extends 'gym/base_admin.html' %}
+{% block title %}Attendance{% endblock %}
+{% block page_title %}ATTEN<span>DANCE</span>{% endblock %}
+
+{% block content %}
+<div class="grid-2" style="align-items:start">
+
+  <!-- Quick Check-In -->
+  <div>
+    <div class="card">
+      <div class="card-header">⚡ Quick Check-In</div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Select Active Member</label>
+            <select name="member" class="form-control" id="memberSelect">
+              <option value="">— Choose member —</option>
+              {% for m in checkin_form.member.field.queryset %}
+              <option value="{{ m.pk }}">{{ m.full_name }} — {{ m.phone }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-full" style="margin-top:4px">
+            ✅ Check In Now
+          </button>
+        </form>
+        <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border); font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; letter-spacing:2px; color:var(--light-gray)">
+          TODAY — {{ today|date:"D, d M Y" }} &nbsp;|&nbsp; {{ count }} Check-in{{ count|pluralize }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter by date -->
+    <div class="card mt-2">
+      <div class="card-header">Browse by Date</div>
+      <div class="card-body">
+        <form method="get" style="display:flex; gap:10px">
+          <input type="date" name="date" value="{{ selected_date }}" class="form-control">
+          <button type="submit" class="btn btn-outline">View</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Log -->
+  <div class="card">
+    <div class="card-header">
+      Check-in Log — {{ selected_date|date:"d M Y" }}
+      <span class="text-muted">{{ count }} entries</span>
+    </div>
+    <div class="table-wrap">
+      {% if records %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Member</th>
+            <th>Time</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records %}
+          <tr>
+            <td class="text-muted">{{ forloop.counter }}</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px">
+                <div class="member-avatar">
+                  {% if r.member.photo %}<img src="{{ r.member.photo.url }}">{% else %}{{ r.member.first_name|first }}{% endif %}
+                </div>
+                <a href="{% url 'member_detail' r.member.pk %}">{{ r.member.full_name }}</a>
+              </div>
+            </td>
+            <td class="text-muted">{{ r.check_in_time|time:"g:i A" }}</td>
+            <td>
+              <form method="post" action="{% url 'attendance_delete' r.pk %}" onsubmit="return confirm('Remove this check-in?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm btn-icon">✕</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div style="padding:40px; text-align:center; color:var(--light-gray)">
+        No check-ins recorded for {{ selected_date|date:"d M Y" }}.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'gym/base_admin.html' %}
+{% block title %}Members{% endblock %}
+{% block page_title %}MEM<span>BERS</span>{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'member_add' %}" class="btn btn-primary btn-sm">+ Add Member</a>
+{% endblock %}
+
+{% block content %}
+<!-- Search & Filter -->
+<form method="get" class="search-bar">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search by name, phone or email…" class="search-input">
+  <select name="status" class="form-control" style="width:160px">
+    <option value="">All Status</option>
+    <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+    <option value="expired" {% if status == 'expired' %}selected{% endif %}>Expired</option>
+    <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+  </select>
+  <button type="submit" class="btn btn-primary">Search</button>
+  {% if q or status %}<a href="{% url 'member_list' %}" class="btn btn-outline">Clear</a>{% endif %}
+</form>
+
+<div class="card">
+  <div class="card-header">
+    All Members
+    <span class="text-muted">{{ total }} record{{ total|pluralize }}</span>
+  </div>
+  <div class="table-wrap">
+    {% if members %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Member</th>
+          <th>Phone</th>
+          <th>Plan</th>
+          <th>Expiry</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in members %}
+        <tr>
+          <td class="text-muted" style="font-size:0.75rem">{{ forloop.counter }}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:10px">
+              <div class="member-avatar">
+                {% if m.photo %}<img src="{{ m.photo.url }}">{% else %}{{ m.first_name|first }}{% endif %}
+              </div>
+              <div>
+                <div><a href="{% url 'member_detail' m.pk %}" style="color:var(--white); text-decoration:none; font-weight:500">{{ m.full_name }}</a></div>
+                <div style="font-size:0.75rem; color:var(--light-gray)">{{ m.email|default:"" }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="text-muted">{{ m.phone }}</td>
+          <td class="text-muted">{{ m.membership_plan.name|default:"—" }}</td>
+          <td>
+            {% if m.plan_end_date %}
+              {% if m.is_expiring_soon %}
+                <span style="color:#fbbf24; font-size:0.82rem">{{ m.plan_end_date|date:"d M Y" }} ⚠️</span>
+              {% else %}
+                <span class="text-muted">{{ m.plan_end_date|date:"d M Y" }}</span>
+              {% endif %}
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            <span class="badge badge-{{ m.status }}">{{ m.get_status_display }}</span>
+          </td>
+          <td>
+            <div style="display:flex; gap:6px">
+              <a href="{% url 'member_detail' m.pk %}" class="btn btn-outline btn-sm btn-icon" title="View">👁</a>
+              <a href="{% url 'member_edit' m.pk %}" class="btn btn-outline btn-sm btn-icon" title="Edit">✏️</a>
+              <a href="{% url 'member_delete' m.pk %}" class="btn btn-danger btn-sm btn-icon" title="Delete">🗑</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div style="padding:48px; text-align:center; color:var(--light-gray)">
+      <div style="font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:3px; margin-bottom:8px">No Members Found</div>
+      <p style="margin-bottom:20px">{% if q %}No results for "{{ q }}"{% else %}Start by adding your first member.{% endif %}</p>
+      <a href="{% url 'member_add' %}" class="btn btn-primary">+ Add First Member</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'gym/base_admin.html' %}
+{% block title %}{{ member.full_name }}{% endblock %}
+{% block page_title %}MEM<span>BER</span>{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'member_edit' member.pk %}" class="btn btn-primary btn-sm">✏️ Edit</a>
+<a href="{% url 'member_list' %}" class="btn btn-outline btn-sm">← Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid-2" style="align-items:start">
+
+  <!-- Left: Profile -->
+  <div>
+    <div class="card">
+      <div class="card-body" style="text-align:center; padding:32px 20px">
+        <div style="width:80px; height:80px; border-radius:50%; background:var(--dark3); border:3px solid var(--red); margin:0 auto 16px; overflow:hidden; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--red)">
+          {% if member.photo %}<img src="{{ member.photo.url }}" style="width:100%; height:100%; object-fit:cover">
+          {% else %}{{ member.first_name|first }}{% endif %}
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:3px">{{ member.full_name }}</div>
+        <div style="margin-top:8px"><span class="badge badge-{{ member.status }}">{{ member.get_status_display }}</span></div>
+        <div style="margin-top:20px; display:flex; justify-content:center; gap:24px">
+          <div style="text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif; font-size:1.8rem; color:var(--red)">{{ total_visits }}</div>
+            <div style="font-size:0.65rem; letter-spacing:2px; color:var(--light-gray); text-transform:uppercase; font-family:'Barlow Condensed',sans-serif">Total Visits</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif; font-size:1.8rem; color:var(--red)">{{ this_month_visits }}</div>
+            <div style="font-size:0.65rem; letter-spacing:2px; color:var(--light-gray); text-transform:uppercase; font-family:'Barlow Condensed',sans-serif">This Month</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-2">
+      <div class="card-header">Contact Info</div>
+      <div class="card-body">
+        <div style="display:flex; flex-direction:column; gap:12px">
+          <div style="display:flex; justify-content:space-between">
+            <span class="text-muted">Phone</span>
+            <span>{{ member.phone }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between">
+            <span class="text-muted">Email</span>
+            <span>{{ member.email|default:"—" }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between">
+            <span class="text-muted">Joined</span>
+            <span>{{ member.join_date|date:"d M Y" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-2">
+      <div class="card-header">Membership</div>
+      <div class="card-body">
+        <div style="display:flex; flex-direction:column; gap:12px">
+          <div style="display:flex; justify-content:space-between">
+            <span class="text-muted">Plan</span>
+            <span>{{ member.membership_plan.name|default:"—" }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between">
+            <span class="text-muted">Start Date</span>
+            <span>{{ member.plan_start_date|date:"d M Y"|default:"—" }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between">
+            <span class="text-muted">End Date</span>
+            <span {% if member.is_expiring_soon %}style="color:#fbbf24"{% endif %}>
+              {{ member.plan_end_date|date:"d M Y"|default:"—" }}
+              {% if member.is_expiring_soon %} ⚠️{% endif %}
+            </span>
+          </div>
+          {% if member.days_until_expiry is not None %}
+          <div style="display:flex; justify-content:space-between">
+            <span class="text-muted">Days Left</span>
+            <span style="color:{% if member.days_until_expiry <= 7 %}#fbbf24{% elif member.days_until_expiry <= 0 %}#f87171{% else %}#4ade80{% endif %}">
+              {{ member.days_until_expiry }} days
+            </span>
+          </div>
+          {% endif %}
+        </div>
+        {% if member.notes %}
+        <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border)">
+          <div class="text-muted" style="margin-bottom:6px; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; font-family:'Barlow Condensed',sans-serif">Notes</div>
+          <div style="font-size:0.85rem; line-height:1.6">{{ member.notes }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: History -->
+  <div>
+    <div class="card">
+      <div class="card-header">
+        Recent Attendance
+        <a href="{% url 'attendance' %}" class="btn btn-outline btn-sm">Log Today</a>
+      </div>
+      <div class="table-wrap">
+        {% if attendances %}
+        <table>
+          <thead><tr><th>Date</th><th>Check-In Time</th></tr></thead>
+          <tbody>
+            {% for a in attendances %}
+            <tr>
+              <td>{{ a.date|date:"D, d M Y" }}</td>
+              <td class="text-muted">{{ a.check_in_time|time:"g:i A" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div style="padding:32px; text-align:center; color:var(--light-gray)">No attendance records yet.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card mt-2">
+      <div class="card-header">
+        Payment History
+        <a href="{% url 'payment_add' %}" class="btn btn-outline btn-sm">+ Record</a>
+      </div>
+      <div class="table-wrap">
+        {% if payments %}
+        <table>
+          <thead><tr><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for p in payments %}
+            <tr>
+              <td>{{ p.payment_date|date:"d M Y" }}</td>
+              <td style="color:var(--red); font-family:'Barlow Condensed',sans-serif; font-size:0.95rem; letter-spacing:1px">₹{{ p.amount }}</td>
+              <td><span class="badge badge-{{ p.status }}">{{ p.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div style="padding:32px; text-align:center; color:var(--light-gray)">No payment records yet.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:16px">
+      <a href="{% url 'member_edit' member.pk %}" class="btn btn-primary w-full">✏️ Edit Member</a>
+      <a href="{% url 'member_delete' member.pk %}" class="btn btn-danger">🗑 Delete</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
