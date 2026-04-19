@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-gym-management-secret-key-change-in-production'
@@ -48,10 +49,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gymmanager.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL=postgresql://neondb_owner:npg_ACQFZk4UbuJ3@ep-quiet-poetry-am11dyq2-pooler.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 LANGUAGE_CODE = 'en-us'
