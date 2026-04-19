@@ -29,7 +29,13 @@
     color: var(--white);
     font-family: 'Barlow', sans-serif;
     overflow-x: hidden;
-    cursor: none;
+    cursor: none; /* Desktop cursor */
+  }
+
+  /* DISABLE CUSTOM CURSOR ON TOUCH DEVICES */
+  @media (hover: none) and (pointer: coarse) {
+    .cursor, .cursor-ring { display: none !important; }
+    body, a, button, .trainer-card, .gallery-item, .plan, .program-card, .testi-card, .nav-cta { cursor: auto !important; }
   }
 
   /* CUSTOM CURSOR */
@@ -58,7 +64,7 @@
 
   /* ---- NAVBAR ---- */
   nav {
-    position: fixed; top:0; left:0; right:0; z-index:500;
+    position: fixed; top:0; left:0; right:0; z-index:1500;
     padding: 20px 60px;
     display: flex; align-items:center; justify-content:space-between;
     background: linear-gradient(to bottom, rgba(8,8,8,0.95), transparent);
@@ -70,11 +76,12 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 2rem; letter-spacing: 4px;
     color: var(--white);
+    position: relative; z-index: 1600;
   }
   .nav-logo span { color: var(--red); }
 
   .nav-links {
-    display:flex; gap:36px; list-style:none;
+    display:flex; gap:36px; list-style:none; align-items: center;
   }
   .nav-links a {
     font-family: 'Barlow Condensed', sans-serif;
@@ -94,6 +101,21 @@
     transition: background 0.2s, transform 0.2s;
   }
   .nav-cta:hover { background: var(--red-dark); transform:scale(1.04); }
+
+  .nav-cta.mobile-only { display: none; }
+  
+  /* HAMBURGER ICON */
+  .hamburger {
+    display: none; flex-direction: column; gap: 6px; cursor: pointer;
+    z-index: 1600;
+  }
+  .hamburger span {
+    display: block; width: 28px; height: 2px; background: var(--white);
+    transition: 0.3s ease;
+  }
+  .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .hamburger.active span:nth-child(2) { opacity: 0; }
+  .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
   /* ---- HERO ---- */
   .hero {
@@ -171,7 +193,7 @@
 
   .hero h1 {
     font-family:'Bebas Neue',sans-serif;
-    font-size: clamp(5rem, 12vw, 11rem);
+    font-size: clamp(4rem, 12vw, 11rem);
     line-height: 0.92; letter-spacing: 2px;
     color: var(--white);
     opacity:0; animation: fadeUp 0.9s 0.5s ease forwards;
@@ -190,7 +212,7 @@
   }
 
   .hero-actions {
-    display:flex; gap:20px; align-items:center;
+    display:flex; gap:20px; align-items:center; flex-wrap: wrap;
     opacity:0; animation: fadeUp 0.8s 1.0s ease forwards;
   }
 
@@ -202,7 +224,7 @@
     padding:16px 44px; cursor:none;
     clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
     position:relative; overflow:hidden; transition:0.25s;
-    text-decoration:none; display:inline-block;
+    text-decoration:none; display:inline-block; text-align: center;
   }
   .btn-primary::after {
     content:''; position:absolute; inset:0;
@@ -217,8 +239,8 @@
     font-size:0.85rem; font-weight:600; letter-spacing:3px;
     text-transform:uppercase; color:var(--light-gray);
     background:transparent; border:1px solid rgba(255,255,255,0.15);
-    padding:15px 40px; cursor:none;
-    text-decoration:none; display:inline-flex; align-items:center; gap:10px;
+    padding:15px 40px; cursor:none; text-align: center;
+    text-decoration:none; display:inline-flex; align-items:center; justify-content: center; gap:10px;
     transition:0.25s;
   }
   .btn-ghost:hover { border-color:var(--red); color:var(--red); }
@@ -491,7 +513,7 @@
   .schedule-header { margin-bottom:48px; display:flex; justify-content:space-between; align-items:flex-end; }
 
   .schedule-tabs {
-    display:flex; gap:4px; margin-bottom:36px;
+    display:flex; flex-wrap: wrap; gap:4px; margin-bottom:36px;
   }
   .sched-tab {
     font-family:'Barlow Condensed',sans-serif; font-size:0.75rem;
@@ -502,7 +524,10 @@
   }
   .sched-tab.active, .sched-tab:hover { background:var(--red); border-color:var(--red); color:var(--white); }
 
-  .schedule-table { width:100%; border-collapse:collapse; }
+  /* Wrap table for mobile scroll */
+  .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  
+  .schedule-table { width:100%; min-width: 600px; border-collapse:collapse; }
   .schedule-table thead tr {
     border-bottom:1px solid rgba(232,40,30,0.2);
   }
@@ -519,7 +544,7 @@
   .schedule-table td { padding:16px 20px; font-size:0.9rem; color:var(--off); }
   .schedule-table td:first-child { color:var(--red); font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:700; }
   .sched-badge {
-    display:inline-block; padding:3px 12px;
+    display:inline-block; padding:3px 12px; white-space: nowrap;
     font-family:'Barlow Condensed',sans-serif; font-size:0.65rem; font-weight:600; letter-spacing:2px; text-transform:uppercase;
   }
   .sched-open { background:rgba(40,200,80,0.12); color:#28c850; border:1px solid rgba(40,200,80,0.2); }
@@ -574,11 +599,11 @@
   .plan-list { list-style:none; margin-bottom:36px; }
   .plan-list li {
     font-size:0.88rem; color:var(--off); padding:8px 0;
-    display:flex; align-items:center; gap:12px;
+    display:flex; align-items:flex-start; gap:12px;
     border-bottom:1px solid rgba(255,255,255,0.04);
   }
   .plan.featured .plan-list li { color:rgba(255,255,255,0.9); border-bottom-color:rgba(255,255,255,0.1); }
-  .plan-list li::before { content:''; width:5px; height:5px; background:var(--red); flex-shrink:0; border-radius:50%; }
+  .plan-list li::before { content:''; width:5px; height:5px; background:var(--red); flex-shrink:0; border-radius:50%; margin-top: 8px; }
   .plan.featured .plan-list li::before { background:var(--white); }
   .plan-list li.no { color:var(--gray); }
   .plan-list li.no::before { background:rgba(255,255,255,0.1); }
@@ -716,7 +741,7 @@
     background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
     color:var(--white); padding:13px 16px; font-size:0.9rem;
     font-family:'Barlow',sans-serif; outline:none; transition:0.2s;
-    -webkit-appearance:none;
+    -webkit-appearance:none; border-radius: 0;
   }
   .form-field input:focus, .form-field textarea:focus, .form-field select:focus {
     border-color:var(--red); background:rgba(232,40,30,0.04);
@@ -779,7 +804,7 @@
 
   .footer-bottom {
     border-top:1px solid rgba(255,255,255,0.05); padding-top:28px;
-    display:flex; justify-content:space-between; align-items:center;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 20px;
   }
   .footer-copy { font-size:0.75rem; color:var(--gray); letter-spacing:1px; }
   .footer-badge {
@@ -798,29 +823,65 @@
   .reveal-delay-3 { transition-delay:0.3s; }
 
   /* SCROLLBAR */
-  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar { width:4px; height: 4px; }
   ::-webkit-scrollbar-track { background:var(--black); }
   ::-webkit-scrollbar-thumb { background:var(--red); }
 
+  /* ========================================= */
+  /* RESPONSIVE DESIGN                         */
+  /* ========================================= */
+  
   @media(max-width:900px){
     nav { padding:16px 24px; }
-    .nav-links { display:none; }
+    
+    /* Display Hamburger & setup mobile menu overlay */
+    .hamburger { display: flex; }
+    .nav-links {
+      position: fixed; top: 0; left: 0; right: 0; height: 100vh;
+      background: rgba(8,8,8,0.98); backdrop-filter: blur(10px);
+      flex-direction: column; justify-content: center; align-items: center;
+      gap: 40px;
+      transform: translateY(-100%); transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+      z-index: 1550; opacity: 0; pointer-events: none;
+    }
+    .nav-links.active {
+      transform: translateY(0); opacity: 1; pointer-events: all;
+    }
+    .nav-links a { font-size: 1.2rem; }
+    
+    .nav-cta.desktop { display: none; }
+    .nav-cta.mobile-only { display: block; margin-top: 20px; font-size: 1rem; padding: 14px 40px; }
+
     .hero-content { padding:0 24px; }
     .hero-stats { display:none; }
-    .manifesto { grid-template-columns:1fr; padding:60px 24px; }
+    .manifesto { grid-template-columns:1fr; padding:60px 24px; gap: 40px; }
     .manifesto-visual { height:320px; }
     .programs-grid { grid-template-columns:1fr; }
-    .stats-section { grid-template-columns:repeat(2,1fr); }
+    .stats-section { grid-template-columns:repeat(2,1fr); padding: 40px 24px; }
+    .stat-item { border-bottom: 1px solid rgba(0,0,0,0.1); padding: 30px 10px; }
     .trainers-grid { grid-template-columns:repeat(2,1fr); }
-    .plans-grid { grid-template-columns:1fr; }
+    .plans-grid { grid-template-columns:1fr; gap: 20px; }
     .plan.featured { transform:none; }
-    .contact-inner { grid-template-columns:1fr; }
+    .contact-inner { grid-template-columns:1fr; gap: 40px; }
     .footer-top { grid-template-columns:1fr 1fr; gap:36px; }
     .schedule,.programs,.trainers,.membership,.testimonials,.gallery,.contact { padding:60px 24px; }
     .gallery-grid { grid-template-columns:1fr 1fr; }
     .gallery-item:nth-child(1) { grid-column:span 2; grid-row:span 1; }
     .gallery-item:nth-child(4) { grid-column:span 1; }
     .form-row { grid-template-columns:1fr; }
+  }
+
+  @media(max-width:600px) {
+    .hero h1 { font-size: 4.5rem; }
+    .trainers-grid { grid-template-columns: 1fr; }
+    .stats-section { grid-template-columns: 1fr; }
+    .stat-item { border-right: none; }
+    .testi-card { width: 85vw; padding: 24px; } /* Fix testimonial overflow */
+    .footer-top { grid-template-columns: 1fr; }
+    .manifesto-badge { width: 100px; height: 100px; bottom: -10px; right: -10px; }
+    .manifesto-badge span { font-size: 0.7rem; }
+    .hero-actions { flex-direction: column; align-items: stretch; }
+    .btn-primary, .btn-ghost { text-align: center; }
   }
 </style>
 </head>
@@ -831,14 +892,22 @@
 
 <nav id="navbar">
   <div class="nav-logo">{{ gym.gym_name|upper }}</div>
-  <ul class="nav-links">
+  
+  <ul class="nav-links" id="navLinks">
     <li><a href="#programs">Programs</a></li>
     <li><a href="#trainers">Trainers</a></li>
     <li><a href="#schedule">Schedule</a></li>
     <li><a href="#membership">Pricing</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><button class="nav-cta mobile-only" onclick="document.getElementById('membership').scrollIntoView({behavior:'smooth'})">Join Now</button></li>
   </ul>
-  <button class="nav-cta" onclick="document.getElementById('membership').scrollIntoView({behavior:'smooth'})">Join Now</button>
+  
+  <div style="display: flex; align-items: center; gap: 20px;">
+    <button class="nav-cta desktop" onclick="document.getElementById('membership').scrollIntoView({behavior:'smooth'})">Join Now</button>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
 </nav>
 
 <section class="hero" id="home">
@@ -1134,27 +1203,28 @@
     <button class="sched-tab" onclick="filterSchedule('cardio',this)">Cardio</button>
     <button class="sched-tab" onclick="filterSchedule('combat',this)">Combat</button>
   </div>
-  <div class="reveal">
-  <table class="schedule-table" id="scheduleTable">
-    <thead>
-      <tr>
-        <th>Time</th><th>Class</th><th>Trainer</th><th>Day</th><th>Duration</th><th>Availability</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr data-cat="strength"><td>5:30 AM</td><td>Powerlifting</td><td>Rahul Kumar</td><td>Mon / Thu</td><td>90 min</td><td><span class="sched-badge sched-limited">4 Left</span></td></tr>
-      <tr data-cat="cardio"><td>6:00 AM</td><td>Morning HIIT</td><td>Priya Singh</td><td>Daily</td><td>45 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
-      <tr data-cat="combat"><td>7:00 AM</td><td>Boxing Basics</td><td>Arjun Verma</td><td>Tue / Fri</td><td>60 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
-      <tr data-cat="cardio"><td>7:30 AM</td><td>Morning Yoga</td><td>Sneha Mehta</td><td>Daily</td><td>60 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
-      <tr data-cat="strength"><td>8:00 AM</td><td>Olympic Lifting</td><td>Rahul Kumar</td><td>Wed / Sat</td><td>75 min</td><td><span class="sched-badge sched-limited">2 Left</span></td></tr>
-      <tr data-cat="cardio"><td>9:00 AM</td><td>Spin Cycle</td><td>Priya Singh</td><td>Tue / Thu / Sat</td><td>45 min</td><td><span class="sched-badge sched-limited">6 Left</span></td></tr>
-      <tr data-cat="combat"><td>6:00 PM</td><td>MMA Fundamentals</td><td>Arjun Verma</td><td>Mon / Wed / Fri</td><td>90 min</td><td><span class="sched-badge sched-full">Full</span></td></tr>
-      <tr data-cat="strength"><td>6:30 PM</td><td>Bodybuilding</td><td>Rahul Kumar</td><td>Mon–Fri</td><td>60 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
-      <tr data-cat="cardio"><td>7:00 PM</td><td>CrossFit WOD</td><td>Priya Singh</td><td>Mon / Wed / Fri</td><td>60 min</td><td><span class="sched-badge sched-limited">8 Left</span></td></tr>
-      <tr data-cat="combat"><td>8:00 PM</td><td>Muay Thai</td><td>Arjun Verma</td><td>Tue / Thu / Sat</td><td>90 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
-      <tr data-cat="cardio"><td>8:30 PM</td><td>Evening Mobility</td><td>Sneha Mehta</td><td>Mon / Wed / Fri</td><td>45 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
-    </tbody>
-  </table>
+  
+  <div class="reveal table-responsive">
+    <table class="schedule-table" id="scheduleTable">
+      <thead>
+        <tr>
+          <th>Time</th><th>Class</th><th>Trainer</th><th>Day</th><th>Duration</th><th>Availability</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-cat="strength"><td>5:30 AM</td><td>Powerlifting</td><td>Rahul Kumar</td><td>Mon / Thu</td><td>90 min</td><td><span class="sched-badge sched-limited">4 Left</span></td></tr>
+        <tr data-cat="cardio"><td>6:00 AM</td><td>Morning HIIT</td><td>Priya Singh</td><td>Daily</td><td>45 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
+        <tr data-cat="combat"><td>7:00 AM</td><td>Boxing Basics</td><td>Arjun Verma</td><td>Tue / Fri</td><td>60 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
+        <tr data-cat="cardio"><td>7:30 AM</td><td>Morning Yoga</td><td>Sneha Mehta</td><td>Daily</td><td>60 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
+        <tr data-cat="strength"><td>8:00 AM</td><td>Olympic Lifting</td><td>Rahul Kumar</td><td>Wed / Sat</td><td>75 min</td><td><span class="sched-badge sched-limited">2 Left</span></td></tr>
+        <tr data-cat="cardio"><td>9:00 AM</td><td>Spin Cycle</td><td>Priya Singh</td><td>Tue / Thu / Sat</td><td>45 min</td><td><span class="sched-badge sched-limited">6 Left</span></td></tr>
+        <tr data-cat="combat"><td>6:00 PM</td><td>MMA Fundamentals</td><td>Arjun Verma</td><td>Mon / Wed / Fri</td><td>90 min</td><td><span class="sched-badge sched-full">Full</span></td></tr>
+        <tr data-cat="strength"><td>6:30 PM</td><td>Bodybuilding</td><td>Rahul Kumar</td><td>Mon–Fri</td><td>60 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
+        <tr data-cat="cardio"><td>7:00 PM</td><td>CrossFit WOD</td><td>Priya Singh</td><td>Mon / Wed / Fri</td><td>60 min</td><td><span class="sched-badge sched-limited">8 Left</span></td></tr>
+        <tr data-cat="combat"><td>8:00 PM</td><td>Muay Thai</td><td>Arjun Verma</td><td>Tue / Thu / Sat</td><td>90 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
+        <tr data-cat="cardio"><td>8:30 PM</td><td>Evening Mobility</td><td>Sneha Mehta</td><td>Mon / Wed / Fri</td><td>45 min</td><td><span class="sched-badge sched-open">Open</span></td></tr>
+      </tbody>
+    </table>
   </div>
 </section>
 
@@ -1223,7 +1293,7 @@
     <div class="section-label">Proof</div>
     <div class="section-title">They <span class="dim">Transformed</span></div>
   </div>
-  <div style="overflow:hidden;">
+  <div style="overflow:hidden; width: 100%;">
   <div class="testi-track">
     <div class="testi-card"><div class="testi-quote-mark">"</div><div class="testi-stars">★★★★★</div><p class="testi-text">"Lost 18 kg in 5 months. The trainers here are on another level — they pushed me past every plateau I thought was permanent."</p><div class="testi-author"><div class="testi-init">VN</div><div><div class="testi-name">Vikram Nair <span class="testi-result">−18 kg</span></div><div class="testi-meta">Member since 2022</div></div></div></div>
     <div class="testi-card"><div class="testi-quote-mark">"</div><div class="testi-stars">★★★★★</div><p class="testi-text">"Went from a total beginner to deadlifting 140 kg in 10 months. The programming here is science-backed and it actually works."</p><div class="testi-author"><div class="testi-init">KT</div><div><div class="testi-name">Karan Thakur <span class="testi-result">140 kg DL</span></div><div class="testi-meta">Member since 2023</div></div></div></div>
@@ -1417,22 +1487,63 @@
 </footer>
 
 <script>
-// Custom cursor
+// Custom cursor handling
 const cursor = document.getElementById('cursor');
 const ring = document.getElementById('cursorRing');
 let mx=0, my=0, rx=0, ry=0;
-document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
-function animRing(){ rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); }
-animRing();
-document.querySelectorAll('a,button,.trainer-card,.gallery-item,.plan,.program-card,.testi-card,.nav-cta').forEach(el=>{
-  el.addEventListener('mouseenter',()=>{ cursor.style.transform='translate(-50%,-50%) scale(2.2)'; cursor.style.background='transparent'; cursor.style.border='1.5px solid var(--red)'; ring.style.transform='translate(-50%,-50%) scale(1.6)'; });
-  el.addEventListener('mouseleave',()=>{ cursor.style.transform='translate(-50%,-50%) scale(1)'; cursor.style.background='var(--red)'; cursor.style.border='none'; ring.style.transform='translate(-50%,-50%) scale(1)'; });
+
+document.addEventListener('mousemove', e => { 
+  mx=e.clientX; my=e.clientY; 
+  if(cursor) { cursor.style.left=mx+'px'; cursor.style.top=my+'px'; }
 });
+
+function animRing(){ 
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; 
+  if(ring) { ring.style.left=rx+'px'; ring.style.top=ry+'px'; }
+  requestAnimationFrame(animRing); 
+}
+animRing();
+
+document.querySelectorAll('a,button,.trainer-card,.gallery-item,.plan,.program-card,.testi-card,.nav-cta').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ 
+    if(cursor) {
+      cursor.style.transform='translate(-50%,-50%) scale(2.2)'; 
+      cursor.style.background='transparent'; cursor.style.border='1.5px solid var(--red)'; 
+      ring.style.transform='translate(-50%,-50%) scale(1.6)'; 
+    }
+  });
+  el.addEventListener('mouseleave',()=>{ 
+    if(cursor) {
+      cursor.style.transform='translate(-50%,-50%) scale(1)'; 
+      cursor.style.background='var(--red)'; cursor.style.border='none'; 
+      ring.style.transform='translate(-50%,-50%) scale(1)'; 
+    }
+  });
+});
+
+// Mobile Hamburger Menu
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
+const navItems = document.querySelectorAll('.nav-links li a, .nav-links li button');
+
+if (hamburger && navLinks) {
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      navLinks.classList.remove('active');
+    });
+  });
+}
 
 // Navbar scroll
 const navbar=document.getElementById('navbar');
 window.addEventListener('scroll',()=>{
-  navbar.classList.toggle('scrolled', window.scrollY>60);
+  if(navbar) navbar.classList.toggle('scrolled', window.scrollY>60);
 });
 
 // Reveal on scroll
